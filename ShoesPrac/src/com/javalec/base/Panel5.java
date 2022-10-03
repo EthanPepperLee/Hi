@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -91,8 +92,6 @@ public class Panel5 extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				insertToPayAction();
 				
-				setVisible(false);
-				Main.frame.getContentPane().add(new Panel3());
 			}
 		});
 		btnBuy.setBounds(316, 399, 117, 29);
@@ -173,8 +172,6 @@ public class Panel5 extends JPanel {
 			sum += a.getAmount() * a.getPrice();
 			Outer_Table.addRow(qTxt);
 		}
-		
-		
 		return sum;
 	}
 	
@@ -190,8 +187,17 @@ public class Panel5 extends JPanel {
 	
 	private void insertToPayAction() {
 		DaoCart dao = new DaoCart();
-		dao.insertToPayAction();
-		dao.updateAction();
+		DaoDetail daoDet = new DaoDetail();
+		int i = daoDet.updateDetailAction();
+		
+		if(i == 0) {
+			JOptionPane.showConfirmDialog(null, "재고를 넘게 주문하셨거나 없는 제품을 주문하셨습니다. \n 주문확인하시고 다시 구매해주세요.");
+		}else {
+			dao.insertToPayAction();
+			dao.updateCartAction();
+			setVisible(false);
+			Main.frame.getContentPane().add(new Panel3());
+		}
 	}
 	
 }

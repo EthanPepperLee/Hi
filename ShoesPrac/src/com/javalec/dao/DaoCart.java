@@ -109,7 +109,7 @@ public class DaoCart {
 	}
 	
 	
-	public int updateAction() {
+	public int updateCartAction() {
 		PreparedStatement ps = null;
 		int i = 0;
 		try {

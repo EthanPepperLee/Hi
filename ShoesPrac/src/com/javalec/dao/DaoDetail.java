@@ -2,11 +2,16 @@ package com.javalec.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import com.javalec.base.Panel3;
+import com.javalec.base.Panel4;
+import com.javalec.dto.DtoCart;
 import com.javalec.dto.DtoDetail;
 import com.javalec.util.DBConnect;
 
@@ -51,7 +56,7 @@ public class DaoDetail {
 	public DtoDetail tableClick() {
 		DtoDetail dto = null;
 		
-		String whereStatement = "select p_product_no, size from detail "; // 마지막 띄워주기
+		String whereStatement = "select detail_no, p_product_no, size, stock from detail "; // 마지막 띄워주기
 		String whereStatement2 = "where detail_no = " + detail_no;
 		
 		try {
@@ -62,9 +67,11 @@ public class DaoDetail {
 			ResultSet rs = stmt_mysql.executeQuery(whereStatement + whereStatement2);
 	
 			if (rs.next()) { // true값일때만 가져온다
-				int wkNo = rs.getInt(1);
-				int wkSize = rs.getInt(2);
-				dto = new DtoDetail(wkNo,wkSize);
+				int wkDetailNo = rs.getInt(1);
+				int wkNo = rs.getInt(2);
+				int wkSize = rs.getInt(3);
+				int wkStock = rs.getInt(4);
+				dto = new DtoDetail(wkDetailNo,wkNo,wkSize,wkStock);
 			}
 			
 			conn_mysql.close();
@@ -76,4 +83,40 @@ public class DaoDetail {
 		return dto;
 	}
 	
+	
+	public int updateDetailAction() {
+		PreparedStatement ps = null;
+		DaoCart dao = new DaoCart();
+		ArrayList<DtoCart> dto = dao.searchAction();
+		
+		int i = 0;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection conn_mysql = DriverManager.getConnection(DBConnect.url_mysql, DBConnect.id_mysql,
+					DBConnect.pw_mysql);
+
+			for(DtoCart a : dto) {
+				String query = "update detail set stock = stock - ? ";
+				String query2 = "where detail_no = ? and stock - ? > 0";
+				
+				ps = conn_mysql.prepareStatement(query + query2);
+				ps.setInt(1, a.getAmount());
+				ps.setInt(2, a.getCd_detail_no());
+				ps.setInt(3, a.getAmount());
+
+				i = ps.executeUpdate();
+				if(i == 0) {
+					break;
+				}
+			}
+			
+			
+
+			conn_mysql.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return i;
+	}
 }

@@ -25,6 +25,14 @@ public class DtoDetail {
 		this.size = size;
 		this.stock = stock;
 	}
+	
+	public DtoDetail(int detail_no,int p_product_no, int size, int stock) {
+		super();
+		this.detail_no = detail_no;
+		this.p_product_no = p_product_no;
+		this.size = size;
+		this.stock = stock;
+	}
 
 
 
